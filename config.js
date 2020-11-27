@@ -1,17 +1,17 @@
 class Config {
     #errorCount = 0;
     #currentNode;
-    #nodes;
-    #nodeErrorSwitch
+    #nodes = [];
+    #nodeErrorSwitch;
 
     constructor(nodes = ["https://api.hive.blog"], nodeErrorSwitch = 3) {
         this.nodes = nodes;
-        this.currentNode = nodes[0];
         this.nodeErrorSwitch = nodeErrorSwitch;
+        this.switchNode();
     }
 
     get errorCount() {
-        return this.#errorCount
+        return this.#errorCount;
     }
 
     get currentNode() {
@@ -28,10 +28,10 @@ class Config {
 
     set nodes(nodes) {
         if (nodes.length === 0) {
-            throw new Error("Nodes can't be empty.")
+            throw new Error("Nodes can't be empty.");
         }
         for (let i = 0; i < nodes.length; i++) {
-            this.addNode(nodes[i])
+            this.addNode(nodes[i]);
         }
     }
 
@@ -73,6 +73,14 @@ class Config {
         if (index === -1) {
             throw new Error("Url isn't in the list");
         }
-        this.nodes.remove(index);
+        if (this.nodes.length === 1){
+            throw new Error("Can't remove last node");
+        }
+        this.nodes.splice(index, 1);
+        if (this.#currentNode === url) {
+            this.switchNode();
+        }
     }
 }
+
+module.exports = Config;
